@@ -1,24 +1,10 @@
+import {GoogleGenerativeAI} from "@google/generative-ai";
 
-/*
- * Install the Generative AI SDK
- *
- * $ npm install @google/generative-ai
- *
- * See the getting started guide for more information
- * https://ai.google.dev/gemini-api/docs/get-started/node
- */
-
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from "@google/generative-ai"
-
-const apikey = "";
+const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-2.0-flash",
 });
 
 const generationConfig = {
@@ -30,17 +16,19 @@ const generationConfig = {
 };
 
 async function run(prompt) {
-  const chatSession = model.startChat({
+  try {
+    const chatSession = model.startChat({
       generationConfig,
-      // safetySettings: Adjust safety settings
-      // See https://ai.google.dev/gemini-api/docs/safety-settings
       history: [],
-  });
+    });
 
-  const result = await chatSession.sendMessage(prompt);
-  console.log(result.response.text());  // Corrected this line
-  const text = result.response.text();  // Corrected this line
-  return text;
+    const result = await chatSession.sendMessage(prompt);
+    console.log(result.response.text());
+    return result.response.text();
+  } catch (error) {
+    console.error("Error in run:", error);
+    return null;
+  }
 }
 
 export default run;
